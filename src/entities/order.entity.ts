@@ -8,9 +8,8 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   Index,
+  Generated,
 } from 'typeorm';
-
-
 
 type OrderHistory = {
   status: OrderStatusEnum;
@@ -25,8 +24,9 @@ export class OrderEntity {
   id: string;
 
   @Index()
-  @Column({ type: 'bigint', unique: true })
-  code: string;
+  @Column({ type: 'int', unique: true })
+  @Generated('increment')
+  code: number;
 
   @Index()
   @Column({
@@ -38,12 +38,6 @@ export class OrderEntity {
 
   @Column({ type: 'enum', enum: PaymentMethodEnum })
   paymentMethod: PaymentMethodEnum;
-
-  @Column({ type: 'varchar', length: 40, nullable: true })
-  paymentCardLast4?: string;
-
-  @Column({ type: 'varchar', length: 80, nullable: true })
-  paymentCardBrand?: string;
 
   @Column({ type: 'varchar', length: 160 })
   customerName: string;
@@ -61,16 +55,16 @@ export class OrderEntity {
   addressComplement?: string;
 
   @Column({ type: 'numeric', precision: 12, scale: 2, default: 0 })
-  subtotal: string;
+  subtotal: number;
 
   @Column({ type: 'numeric', precision: 12, scale: 2, default: 0 })
-  deliveryFee: string;
+  deliveryFee: number;
 
   @Column({ type: 'numeric', precision: 12, scale: 2, default: 0 })
-  discount: string;
+  discount: number;
 
   @Column({ type: 'numeric', precision: 12, scale: 2, default: 0 })
-  total: string;
+  total: number;
 
   @Column({ type: 'jsonb', default: () => "'[]'::jsonb" })
   items: OrderItem[];

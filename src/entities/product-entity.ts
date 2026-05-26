@@ -15,7 +15,7 @@ import { IsEnum, IsOptional } from 'class-validator';
 @Entity('products')
 export class ProductEntity {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id!: string;
 
   @Index()
   @Column({ length: 180 })

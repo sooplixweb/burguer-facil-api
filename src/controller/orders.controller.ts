@@ -3,53 +3,44 @@ import {
   Get,
   Post,
   Body,
+  Delete,
   Param,
   Patch,
-  Delete,
-  UploadedFiles,
-  UseInterceptors,
 } from '@nestjs/common';
-import { FilesInterceptor } from '@nestjs/platform-express';
-import { plainToInstance } from 'class-transformer';
-import { ProductRequestDto } from 'src/dtos/request/product-request.dto';
-import { UpdateProductRequestDto } from 'src/dtos/request/update-product.dto';
-import { ProductResponseDto } from 'src/dtos/response/product-response.dto';
-import { ProductsService } from 'src/services/products.service';
+import { OrderStatusEnum } from 'src/dtos/enums/order-status.enum';
+import { AlterStatusDto, OrderRequestDto } from 'src/dtos/request/order-request.dto';
+import { OrderResponseDto } from 'src/dtos/response/orders-response.dto';
+import { OrdersService } from 'src/services/orders.service';
 
 @Controller('orders')
 export class OrdersController {
-  constructor(private readonly productsService: ProductsService) {}
+  constructor(private readonly ordersService: OrdersService) {}
 
   @Post()
-  @UseInterceptors(FilesInterceptor('files'))
-  async create(
-    @Body() dto: ProductRequestDto,
-    @UploadedFiles() files: Express.Multer.File[],
-  ) {
-    const product = await this.productsService.create(dto, files);
-    return plainToInstance(ProductResponseDto, product);
+  async create(@Body() dto: OrderRequestDto): Promise<OrderResponseDto> {
+    return await this.ordersService.create(dto);
   }
-  @Get()
-  async findAll() {
-    const products = await this.productsService.findAll();
-    console.log(products);
-    return plainToInstance(ProductResponseDto, products);
+
+  @Get('find-all')
+  async findAll(): Promise<OrderResponseDto[]> {
+    return await this.ordersService.findAll();
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: string) {
-    const product = await this.productsService.findOne(id);
-    return plainToInstance(ProductResponseDto, product);
+  async findById(@Param('id') id: string): Promise<OrderResponseDto> {
+    return await this.ordersService.findById(id);
   }
 
   @Patch(':id')
-  async update(@Param('id') id: string, @Body() dto: UpdateProductRequestDto) {
-    const product = await this.productsService.update(id, dto);
-    return plainToInstance(ProductResponseDto, product);
+  async alterStatus(
+    @Param('id') id: string,
+    @Body() status: AlterStatusDto,
+  ): Promise<OrderResponseDto> {
+    return this.ordersService.alterStatus(id, status);
   }
 
   @Delete(':id')
   async remove(@Param('id') id: string) {
-    return this.productsService.remove(id);
+    return this.ordersService.remove(id);
   }
 }

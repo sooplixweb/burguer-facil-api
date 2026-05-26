@@ -12,9 +12,10 @@ export const typeOrmConfig = (
   database: configService.get<string>('DB_DATABASE'),
   schema: configService.get<string>('DB_SCHEMA') ?? 'public',
 
-  ssl: {
-    rejectUnauthorized: false,
-  },
+  ssl:
+    configService.get<string>('DB_SSL') === 'true'
+      ? { rejectUnauthorized: false }
+      : false,
 
   autoLoadEntities: true,
   synchronize: true,

@@ -9,23 +9,26 @@ async function bootstrap() {
 
   app.enableCors({
     origin: '*',
-    methods: 'GET,POST,PUT,PATCH,DELETE',
+    methods: 'GET,POST,PUT,PATCH,DELETE,OPTIONS',
     allowedHeaders: 'Content-Type, Authorization',
   });
-  // app.useGlobalPipes(
-  //   new ValidationPipe({
-  //     whitelist: true,
-  //     forbidNonWhitelisted: true,
-  //     transform: true,
-  //   }),
-  // );
+
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    }),
+  );
+
   app.useStaticAssets(join(__dirname, '..', 'uploads'), {
     prefix: '/uploads',
   });
 
-  // app.useGlobalPipes(new ValidationPipe());
+  const port = process.env.PORT ?? 3000;
+  await app.listen(port, '0.0.0.0');
 
-  await app.listen(process.env.PORT ?? 3000);
+  console.log(`API rodando na porta ${port}`);
 }
 
 bootstrap();
