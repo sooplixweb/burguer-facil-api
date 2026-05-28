@@ -94,13 +94,24 @@ export class SystemSettingsService {
       timeZone: settings.timezone,
     });
 
+    const currentMinutes = this.timeToMinutes(currentTime);
+    const openingMinutes = this.timeToMinutes(settings.openingTime);
+    const closingMinutes = this.timeToMinutes(settings.closingTime);
+
     const isOpen =
-      currentTime >= settings.openingTime &&
-      currentTime <= settings.closingTime;
+      openingMinutes === closingMinutes ||
+      (openingMinutes < closingMinutes
+        ? currentMinutes >= openingMinutes && currentMinutes < closingMinutes
+        : currentMinutes >= openingMinutes || currentMinutes < closingMinutes);
 
     return {
       available: isOpen,
       reason: isOpen ? undefined : 'Fora do horário de funcionamento.',
     };
+  }
+
+  private timeToMinutes(time: string): number {
+    const [hour, minute] = time.slice(0, 5).split(':').map(Number);
+    return hour * 60 + minute;
   }
 }

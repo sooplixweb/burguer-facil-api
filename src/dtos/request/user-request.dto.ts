@@ -3,12 +3,18 @@ import {
   IsNotEmpty,
   IsEmail,
   MinLength,
+  IsEnum,
 } from 'class-validator';
+import { UserRole } from '../enums/user-role.enum';
 
 export class UserRequestDto {
   @IsString()
   @IsNotEmpty()
   name: string;
+
+  @IsEnum(UserRole)
+  @IsNotEmpty()
+  role: UserRole;
 
   @IsEmail()
   @IsNotEmpty()
