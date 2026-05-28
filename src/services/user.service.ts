@@ -6,9 +6,6 @@ import {
 } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ProductRequestDto } from 'src/dtos/request/product-request.dto';
-import { UpdateProductRequestDto } from 'src/dtos/request/update-product.dto';
-import { ProductStatusEnum } from 'src/dtos/enums/product-status.enum';
 import { UserEntity } from 'src/entities/user.entity';
 import { UserRequestDto } from 'src/dtos/request/user-request.dto';
 import { UserResponseDto } from 'src/dtos/response/user-response.dto';
@@ -16,7 +13,6 @@ import { plainToInstance } from 'class-transformer';
 import * as bcrypt from 'bcrypt';
 import { LoginRequestDto } from 'src/dtos/request/login-request.dto';
 import { LoginResponseDto } from 'src/dtos/response/login-response.dto';
-import e from 'express';
 import { JwtService } from '@nestjs/jwt';
 @Injectable()
 export class UserService {
@@ -104,6 +100,7 @@ export class UserService {
 
     return `Usuario ${user.name}`;
   }
+
   async login(dto: LoginRequestDto): Promise<LoginResponseDto> {
     const user = await this.repo.findOne({ where: { email: dto.email } });
 
@@ -122,7 +119,8 @@ export class UserService {
 
     return {
       token,
-      expiresIn: 60, // só informativo para o front
+      expiresIn: 60,
+      role: user.role, // só informativo para o front
     };
   }
 }
