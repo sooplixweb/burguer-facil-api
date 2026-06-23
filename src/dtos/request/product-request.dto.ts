@@ -1,4 +1,4 @@
-import { Transform, Type } from 'class-transformer';
+import { plainToInstance, Transform, Type } from 'class-transformer';
 import {
   IsString,
   IsOptional,
@@ -36,11 +36,13 @@ export class ProductRequestDto {
   @IsNumber()
   @Min(0)
   @IsNotEmpty({ message: 'Campo price vazio' })
+  @Type(() => Number)
   price: number;
 
   @IsOptional()
   @IsNumber()
   @Min(0)
+  @Type(() => Number)
   promoPrice?: number;
 
   @Transform(({ value }) => value === true || value === 'true')
@@ -50,10 +52,27 @@ export class ProductRequestDto {
   @IsOptional()
   @IsInt()
   @Min(0)
+  @Type(() => Number)
   stock?: number;
 
   @IsOptional()
   @IsArray()
+  @Transform(({ value }) => {
+    if (Array.isArray(value)) {
+      return plainToInstance(ProductAddonRequestDto, value);
+    }
+
+    if (typeof value !== 'string') return value;
+
+    try {
+      const parsed = JSON.parse(value);
+      return Array.isArray(parsed)
+        ? plainToInstance(ProductAddonRequestDto, parsed)
+        : [];
+    } catch {
+      return [];
+    }
+  })
   @ValidateNested({ each: true })
   @Type(() => ProductAddonRequestDto)
   addons?: ProductAddonRequestDto[];

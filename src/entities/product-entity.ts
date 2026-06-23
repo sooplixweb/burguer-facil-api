@@ -11,6 +11,7 @@ import { ImageEntity } from './image.entity';
 import { ProductCategoryEnum } from 'src/dtos/enums/product-category.enum';
 import { ProductStatusEnum } from 'src/dtos/enums/product-status.enum';
 import { IsEnum, IsOptional } from 'class-validator';
+import { ProductAddonRequestDto } from 'src/dtos/request/product-addons-request.dto';
 
 @Entity('products')
 export class ProductEntity {
@@ -43,6 +44,9 @@ export class ProductEntity {
 
   @Column({ nullable: true, default: 0 })
   stock?: number;
+
+  @Column({ type: 'jsonb', nullable: true, default: () => "'[]'" })
+  addons?: ProductAddonRequestDto[];
 
   @OneToMany(() => ImageEntity, (image) => image.product, {
     cascade: true,
