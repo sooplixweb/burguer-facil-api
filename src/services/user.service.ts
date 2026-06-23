@@ -49,8 +49,8 @@ export class UserService {
     });
   }
 
-  async findAll(): Promise<UserResponseDto> {
-    const users = this.repo.find();
+  async findAll(): Promise<UserResponseDto[]> {
+    const users = await this.repo.find();
     return plainToInstance(UserResponseDto, users);
   }
 

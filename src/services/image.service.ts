@@ -2,9 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ImageEntity } from 'src/entities/image.entity';
 import { Repository } from 'typeorm';
-import { v4 as uuid } from 'uuid';
-import * as fs from 'fs';
-import * as path from 'path';
 import { ProductEntity } from 'src/entities/product-entity';
 
 @Injectable()

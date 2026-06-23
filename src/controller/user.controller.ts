@@ -8,12 +8,22 @@ import {
   UseGuards,
   Request,
 } from '@nestjs/common';
+import type { Request as ExpressRequest } from 'express';
 import { UserService } from 'src/services/user.service';
 import { UserRequestDto } from 'src/dtos/request/user-request.dto';
 import { UserResponseDto } from 'src/dtos/response/user-response.dto';
 import { LoginRequestDto } from 'src/dtos/request/login-request.dto';
 import { LoginResponseDto } from 'src/dtos/response/login-response.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+
+type AuthenticatedUser = {
+  id: string;
+  email: string;
+};
+
+type AuthenticatedRequest = ExpressRequest & {
+  user: AuthenticatedUser;
+};
 
 @Controller('users')
 export class UsersController {
@@ -31,12 +41,12 @@ export class UsersController {
 
   @UseGuards(JwtAuthGuard)
   @Get('me')
-  me(@Request() req) {
+  me(@Request() req: AuthenticatedRequest): AuthenticatedUser {
     return req.user;
   }
 
   @Get()
-  findAll(): Promise<UserResponseDto> {
+  findAll(): Promise<UserResponseDto[]> {
     return this.usersService.findAll();
   }
 

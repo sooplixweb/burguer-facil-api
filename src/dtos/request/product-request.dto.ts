@@ -45,7 +45,9 @@ export class ProductRequestDto {
   @Type(() => Number)
   promoPrice?: number;
 
-  @Transform(({ value }) => value === true || value === 'true')
+  @Transform(
+    ({ value }: { value: unknown }) => value === true || value === 'true',
+  )
   @IsBoolean()
   stockEnabled: boolean;
 
@@ -57,17 +59,17 @@ export class ProductRequestDto {
 
   @IsOptional()
   @IsArray()
-  @Transform(({ value }) => {
+  @Transform(({ value }: { value: unknown }) => {
     if (Array.isArray(value)) {
-      return plainToInstance(ProductAddonRequestDto, value);
+      return plainToInstance(ProductAddonRequestDto, value as object[]);
     }
 
     if (typeof value !== 'string') return value;
 
     try {
-      const parsed = JSON.parse(value);
+      const parsed: unknown = JSON.parse(value);
       return Array.isArray(parsed)
-        ? plainToInstance(ProductAddonRequestDto, parsed)
+        ? plainToInstance(ProductAddonRequestDto, parsed as object[])
         : [];
     } catch {
       return [];

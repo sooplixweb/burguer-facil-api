@@ -7,8 +7,10 @@ import {
   Param,
   Patch,
 } from '@nestjs/common';
-import { OrderStatusEnum } from 'src/dtos/enums/order-status.enum';
-import { AlterStatusDto, OrderRequestDto } from 'src/dtos/request/order-request.dto';
+import {
+  AlterStatusDto,
+  OrderRequestDto,
+} from 'src/dtos/request/order-request.dto';
 import { OrderResponseDto } from 'src/dtos/response/orders-response.dto';
 import { OrdersService } from 'src/services/orders.service';
 

@@ -2,7 +2,10 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { OrderEntity } from 'src/entities/order.entity';
-import { AlterStatusDto, OrderRequestDto } from 'src/dtos/request/order-request.dto';
+import {
+  AlterStatusDto,
+  OrderRequestDto,
+} from 'src/dtos/request/order-request.dto';
 import { OrderResponseDto } from 'src/dtos/response/orders-response.dto';
 import { plainToInstance } from 'class-transformer';
 import { OrderStatusEnum } from 'src/dtos/enums/order-status.enum';
@@ -45,58 +48,67 @@ export class OrdersService {
     return plainToInstance(OrderResponseDto, order);
   }
 
-async alterStatus(
-  id: string,
-  status: AlterStatusDto,
-): Promise<OrderResponseDto> {
-  const order = await this.repo.findOne({
-    where: { id },
-  });
+  async alterStatus(
+    id: string,
+    status: AlterStatusDto,
+  ): Promise<OrderResponseDto> {
+    const order = await this.repo.findOne({
+      where: { id },
+    });
 
-  if (!order) {
-    throw new NotFoundException('Pedido não encontrado');
+    if (!order) {
+      throw new NotFoundException('Pedido não encontrado');
+    }
+
+    if (
+      status.status === OrderStatusEnum.RECEIVED &&
+      order.status !== OrderStatusEnum.PREPARING
+    ) {
+      order.status = OrderStatusEnum.PREPARING;
+      order.history = [
+        ...(order.history ?? []),
+        {
+          status: OrderStatusEnum.PREPARING,
+          label: 'Pedido em preparação',
+          createdAt: new Date().toISOString(),
+        },
+      ];
+    }
+
+    if (
+      status.status === OrderStatusEnum.PREPARING &&
+      order.status !== OrderStatusEnum.ON_ROUTE
+    ) {
+      order.status = OrderStatusEnum.ON_ROUTE;
+      order.history = [
+        ...(order.history ?? []),
+        {
+          status: OrderStatusEnum.ON_ROUTE,
+          label: 'Pedido em rota',
+          createdAt: new Date().toISOString(),
+        },
+      ];
+    }
+
+    if (
+      status.status === OrderStatusEnum.ON_ROUTE &&
+      order.status !== OrderStatusEnum.DELIVERED
+    ) {
+      order.status = OrderStatusEnum.DELIVERED;
+      order.history = [
+        ...(order.history ?? []),
+        {
+          status: OrderStatusEnum.DELIVERED,
+          label: 'Pedido entregue',
+          createdAt: new Date().toISOString(),
+        },
+      ];
+    }
+
+    const data = await this.repo.save(order);
+
+    return plainToInstance(OrderResponseDto, data);
   }
-
-  if (status.status === OrderStatusEnum.RECEIVED && order.status !== OrderStatusEnum.PREPARING) {
-    order.status = OrderStatusEnum.PREPARING;
-    order.history = [
-      ...(order.history ?? []),
-      {
-        status: OrderStatusEnum.PREPARING,
-        label: 'Pedido em preparação',
-        createdAt: new Date().toISOString(),
-      },
-    ];
-  }
-
-  if (status.status === OrderStatusEnum.PREPARING && order.status !== OrderStatusEnum.ON_ROUTE) {
-    order.status = OrderStatusEnum.ON_ROUTE;
-    order.history = [
-      ...(order.history ?? []),
-      {
-        status: OrderStatusEnum.ON_ROUTE,
-        label: 'Pedido em rota',
-        createdAt: new Date().toISOString(),
-      },
-    ];
-  }
-
-  if (status.status === OrderStatusEnum.ON_ROUTE && order.status !== OrderStatusEnum.DELIVERED) {
-    order.status = OrderStatusEnum.DELIVERED;
-    order.history = [
-      ...(order.history ?? []),
-      {
-        status: OrderStatusEnum.DELIVERED,
-        label: 'Pedido entregue',
-        createdAt: new Date().toISOString(),
-      },
-    ];
-  }
-
-  const data = await this.repo.save(order);
-
-  return plainToInstance(OrderResponseDto, data);
-}
 
   // async update(id: string, dto: UpdateProductDto) {
   //   const product = await this.findOne(id);

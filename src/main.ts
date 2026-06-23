@@ -31,4 +31,4 @@ async function bootstrap() {
   console.log(`API rodando na porta ${port}`);
 }
 
-bootstrap();
+void bootstrap();

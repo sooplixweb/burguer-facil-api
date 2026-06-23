@@ -10,7 +10,7 @@ import {
 import { ImageEntity } from './image.entity';
 import { ProductCategoryEnum } from 'src/dtos/enums/product-category.enum';
 import { ProductStatusEnum } from 'src/dtos/enums/product-status.enum';
-import { IsEnum, IsOptional } from 'class-validator';
+import { IsOptional } from 'class-validator';
 import { ProductAddonRequestDto } from 'src/dtos/request/product-addons-request.dto';
 
 @Entity('products')
@@ -39,7 +39,7 @@ export class ProductEntity {
   @Column({ type: 'numeric', precision: 12, scale: 2, nullable: true })
   promoPrice?: string;
 
-  @Column({nullable:false})
+  @Column({ nullable: false })
   stockEnabled: boolean;
 
   @Column({ nullable: true, default: 0 })

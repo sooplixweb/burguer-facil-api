@@ -5,9 +5,7 @@ import { SystemSettingsService } from 'src/services/system-settings.service';
 
 @Controller('system-settings')
 export class SystemSettingsController {
-  constructor(
-    private readonly systemSettingsService: SystemSettingsService,
-  ) {}
+  constructor(private readonly systemSettingsService: SystemSettingsService) {}
 
   @Get()
   findSettings(): Promise<SystemSettingsResponseDto> {

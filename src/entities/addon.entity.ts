@@ -1,19 +1,18 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToMany, Index } from "typeorm";
-import { ProductEntity } from "./product-entity";
+import { Entity, PrimaryGeneratedColumn, Column, Index } from 'typeorm';
 
-@Entity("addons")
+@Entity('addons')
 export class AddonEntity {
-  @PrimaryGeneratedColumn("uuid")
+  @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Index()
-  @Column({ type: "varchar", length: 120 })
+  @Column({ type: 'varchar', length: 120 })
   name: string;
 
-  @Column({ type: "numeric", precision: 12, scale: 2, default: 0 })
+  @Column({ type: 'numeric', precision: 12, scale: 2, default: 0 })
   price: string;
 
-  @Column({ type: "boolean", default: true })
+  @Column({ type: 'boolean', default: true })
   isActive: boolean;
 
   // @ManyToMany(() => ProductEntity, (p) => p.addons)

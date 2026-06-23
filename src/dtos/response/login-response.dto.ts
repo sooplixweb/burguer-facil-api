@@ -4,7 +4,7 @@ import { UserRole } from '../enums/user-role.enum';
 export class LoginResponseDto {
   @Expose()
   token: string;
-  
+
   @Expose()
   expiresIn: number;
 

@@ -58,7 +58,9 @@ export class SystemSettingsService {
     return settings;
   }
 
-  private toResponse(settings: SystemSettingsEntity): SystemSettingsResponseDto {
+  private toResponse(
+    settings: SystemSettingsEntity,
+  ): SystemSettingsResponseDto {
     const availability = this.getAvailability(settings);
 
     return {

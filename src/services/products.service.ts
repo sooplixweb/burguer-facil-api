@@ -36,7 +36,9 @@ export class ProductsService {
     this.logger.log(`Produto criado com ID: ${product.id}`);
 
     if (files?.length) {
-      this.logger.log(`Salvando ${files.length} imagens para o produto ${product.id}`);
+      this.logger.log(
+        `Salvando ${files.length} imagens para o produto ${product.id}`,
+      );
       const images = await this.imageService.saveAll(files, product);
       product.images = images;
       await this.repo.save(product);
