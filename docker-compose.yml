@@ -9,14 +9,14 @@ services:
       - /app/node_modules
     environment:
       NODE_ENV: development
-      DATABASE_URL: postgresql://burguerfacil_user:vHnNN5rO6mnUuphnvDqastUDqlPoXzPU@dpg-d8v8t4bsq97s7381slmg-a.oregon-postgres.render.com/burguerfacil
-      DB_HOST: ${DB_HOST:-dpg-d8v8t4bsq97s7381slmg-a.oregon-postgres.render.com}
-      DB_PORT: ${DB_PORT:-5432}
-      DB_USERNAME: ${DB_USERNAME:-burguerfacil_user}
-      DB_PASSWORD: ${DB_PASSWORD:-vHnNN5rO6mnUuphnvDqastUDqlPoXzPU}
-      DB_DATABASE: ${DB_DATABASE:-burguerfacil}
-      DB_SCHEMA: ${DB_SCHEMA:-public}
-      DB_SSL: ${DB_SSL:-true}
+      DATABASE_URL: postgresql://burguerfacil_user:vHnNN5rO6mnUuphnvDqastUDqlPoXzPU@dpg-d8v8t4bsq97s7381slmg-a.oregon-postgres.render.com:5432/burguerfacil?sslmode=require
+      DB_HOST: dpg-d8v8t4bsq97s7381slmg-a.oregon-postgres.render.com
+      DB_PORT: 5432
+      DB_USERNAME: burguerfacil_user
+      DB_PASSWORD: vHnNN5rO6mnUuphnvDqastUDqlPoXzPU
+      DB_DATABASE: burguerfacil
+      DB_SCHEMA: public
+      DB_SSL: true
     depends_on:
       - postgres
     command: npm run start:dev
