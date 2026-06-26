@@ -41,7 +41,8 @@ export const typeOrmConfig = (
   return {
     type: 'postgres',
     host: parsedConnection?.host ?? configService.get<string>('DB_HOST'),
-    port: parsedConnection?.port ?? Number(configService.get('DB_PORT') ?? 5432),
+    port:
+      parsedConnection?.port ?? Number(configService.get('DB_PORT') ?? 5432),
     username:
       parsedConnection?.username ?? configService.get<string>('DB_USERNAME'),
     password:
