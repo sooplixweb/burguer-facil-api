@@ -12,6 +12,10 @@ export class UserRequestDto {
   @IsNotEmpty()
   name: string;
 
+  @IsString()
+  @IsNotEmpty()
+  phone: string;
+
   @IsEnum(UserRole)
   @IsNotEmpty()
   role: UserRole;

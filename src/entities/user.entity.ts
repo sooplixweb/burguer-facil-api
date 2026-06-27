@@ -9,6 +9,9 @@ export class UserEntity {
   @Column({ nullable: false })
   name: string;
 
+  @Column({ nullable: true })
+  phone: string;
+
   @Column({
     type: 'enum',
     enum: UserRole,

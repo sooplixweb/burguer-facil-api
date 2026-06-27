@@ -1,4 +1,5 @@
 import {
+  ConflictException,
   Injectable,
   Logger,
   NotFoundException,
@@ -30,7 +31,7 @@ export class UserService {
     });
 
     if (userExists) {
-      throw new Error('Email já cadastrado');
+      throw new ConflictException('Esse e-mail já está cadastrado');
     }
 
     const passwordHash = await bcrypt.hash(dto.password, 10);
@@ -40,6 +41,7 @@ export class UserService {
       email: dto.email,
       password: passwordHash,
       role: dto.role,
+      phone: dto.phone,
     });
 
     const savedUser = await this.repo.save(userSave);
@@ -60,6 +62,7 @@ export class UserService {
     });
     return plainToInstance(UserResponseDto, user);
   }
+
   async update(id: string, dto: UserRequestDto): Promise<UserResponseDto> {
     const user = await this.repo.findOne({
       where: { id },
@@ -75,6 +78,10 @@ export class UserService {
 
     if (dto.email) {
       user.email = dto.email;
+    }
+
+    if (dto.phone) {
+      user.phone = dto.phone;
     }
 
     if (dto.password) {
