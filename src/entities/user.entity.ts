@@ -1,5 +1,5 @@
 import { UserRole } from 'src/dtos/enums/user-role.enum';
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from 'typeorm';
 
 @Entity('user')
 export class UserEntity {
@@ -25,4 +25,7 @@ export class UserEntity {
 
   @Column({ nullable: false })
   password: string;
+
+  @CreateDateColumn({ type: 'timestamp' })
+  dateRegistration: Date;
 }

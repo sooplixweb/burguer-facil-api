@@ -16,4 +16,7 @@ export class UserResponseDto {
 
   @Expose()
   email: string;
+  
+  @Expose()
+  dateRegistration: Date;
 }

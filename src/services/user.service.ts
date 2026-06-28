@@ -128,7 +128,8 @@ export class UserService {
     return {
       token,
       expiresIn: 60,
-      role: user.role, // só informativo para o front
+      role: user.role,
+      user: user, // só informativo para o front
     };
   }
 }
