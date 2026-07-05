@@ -48,11 +48,18 @@ export class UsersController {
     return req.user;
   }
 
-  @Get()
+  @UseGuards(JwtAuthGuard)
+  @Get('find-all')
   findAll(): Promise<UserResponseDto[]> {
     return this.usersService.findAll();
   }
-  
+
+  @UseGuards(JwtAuthGuard)
+  @Get('customers')
+  findCustomers(): Promise<UserResponseDto[]> {
+    return this.usersService.findCustomers();
+  }
+
   @UseGuards(JwtAuthGuard)
   @Get(':id')
   findOne(@Param('id') id: string): Promise<UserResponseDto> {

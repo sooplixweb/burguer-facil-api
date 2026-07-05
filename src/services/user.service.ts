@@ -15,6 +15,7 @@ import * as bcrypt from 'bcrypt';
 import { LoginRequestDto } from 'src/dtos/request/login-request.dto';
 import { LoginResponseDto } from 'src/dtos/response/login-response.dto';
 import { JwtService } from '@nestjs/jwt';
+import { UserRole } from 'src/dtos/enums/user-role.enum';
 @Injectable()
 export class UserService {
   private readonly logger = new Logger(UserService.name);
@@ -52,15 +53,33 @@ export class UserService {
   }
 
   async findAll(): Promise<UserResponseDto[]> {
-    const users = await this.repo.find();
-    return plainToInstance(UserResponseDto, users);
+    const users = await this.repo.find({
+      order: { dateRegistration: 'DESC' },
+    });
+
+    return plainToInstance(UserResponseDto, users, {
+      excludeExtraneousValues: true,
+    });
+  }
+
+  async findCustomers(): Promise<UserResponseDto[]> {
+    const users = await this.repo.find({
+      where: { role: UserRole.CUSTOMER },
+      order: { dateRegistration: 'DESC' },
+    });
+
+    return plainToInstance(UserResponseDto, users, {
+      excludeExtraneousValues: true,
+    });
   }
 
   async findOne(id: string): Promise<UserResponseDto> {
     const user = await this.repo.findOne({
       where: { id },
     });
-    return plainToInstance(UserResponseDto, user);
+    return plainToInstance(UserResponseDto, user, {
+      excludeExtraneousValues: true,
+    });
   }
 
   async update(id: string, dto: UserRequestDto): Promise<UserResponseDto> {
