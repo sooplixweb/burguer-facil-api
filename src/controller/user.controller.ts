@@ -11,6 +11,7 @@ import {
 import type { Request as ExpressRequest } from 'express';
 import { UserService } from 'src/services/user.service';
 import { UserRequestDto } from 'src/dtos/request/user-request.dto';
+import { UpdateUserRequestDto } from 'src/dtos/request/update-user-request.dto';
 import { UserResponseDto } from 'src/dtos/response/user-response.dto';
 import { LoginRequestDto } from 'src/dtos/request/login-request.dto';
 import { LoginResponseDto } from 'src/dtos/response/login-response.dto';
@@ -66,10 +67,11 @@ export class UsersController {
     return this.usersService.findOne(id);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Put(':id')
   update(
     @Param('id') id: string,
-    @Body() dto: UserRequestDto,
+    @Body() dto: UpdateUserRequestDto,
   ): Promise<UserResponseDto> {
     return this.usersService.update(id, dto);
   }

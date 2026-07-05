@@ -9,6 +9,7 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from 'src/entities/user.entity';
 import { UserRequestDto } from 'src/dtos/request/user-request.dto';
+import { UpdateUserRequestDto } from 'src/dtos/request/update-user-request.dto';
 import { UserResponseDto } from 'src/dtos/response/user-response.dto';
 import { plainToInstance } from 'class-transformer';
 import * as bcrypt from 'bcrypt';
@@ -82,7 +83,10 @@ export class UserService {
     });
   }
 
-  async update(id: string, dto: UserRequestDto): Promise<UserResponseDto> {
+  async update(
+    id: string,
+    dto: UpdateUserRequestDto,
+  ): Promise<UserResponseDto> {
     const user = await this.repo.findOne({
       where: { id },
     });
