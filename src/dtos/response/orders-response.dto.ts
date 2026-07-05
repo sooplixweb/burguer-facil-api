@@ -1,6 +1,7 @@
 import { OrderStatusEnum } from 'src/dtos/enums/order-status.enum';
 import { PaymentMethodEnum } from 'src/dtos/enums/payment-method.enum';
 import { OrderItem } from 'src/types/order-Item-type';
+import { UserResponseDto } from './user-response.dto';
 
 type OrderHistory = {
   status: OrderStatusEnum;
@@ -11,6 +12,8 @@ type OrderHistory = {
 
 export class OrderResponseDto {
   id: string;
+  userId: string;
+  user: UserResponseDto;
   code: number;
   status: OrderStatusEnum;
   paymentMethod: PaymentMethodEnum;

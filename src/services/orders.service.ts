@@ -9,6 +9,13 @@ import {
 import { OrderResponseDto } from 'src/dtos/response/orders-response.dto';
 import { plainToInstance } from 'class-transformer';
 import { OrderStatusEnum } from 'src/dtos/enums/order-status.enum';
+import { UserRole } from 'src/dtos/enums/user-role.enum';
+
+type AuthenticatedUser = {
+  id: string;
+  email: string;
+  role: UserRole;
+};
 
 @Injectable()
 export class OrdersService {
@@ -17,8 +24,11 @@ export class OrdersService {
     private readonly repo: Repository<OrderEntity>,
   ) {}
 
-  async create(dto: OrderRequestDto): Promise<OrderResponseDto> {
-    const order = this.repo.create(dto);
+  async create(
+    dto: OrderRequestDto,
+    userId: string,
+  ): Promise<OrderResponseDto> {
+    const order = this.repo.create({ ...dto, userId });
     order.history = [
       {
         status: OrderStatusEnum.RECEIVED,
@@ -31,14 +41,25 @@ export class OrdersService {
     return plainToInstance(OrderResponseDto, order);
   }
 
-  async findAll(): Promise<OrderResponseDto[]> {
-    const orders = await this.repo.find();
+  async findAll(user: AuthenticatedUser): Promise<OrderResponseDto[]> {
+    const where = user.role === UserRole.ADMIN ? {} : { userId: user.id };
+    const orders = await this.repo.find({
+      where,
+      relations: { user: true },
+    });
     return plainToInstance(OrderResponseDto, orders);
   }
 
-  async findById(id: string): Promise<OrderResponseDto> {
+  async findById(
+    id: string,
+    user: AuthenticatedUser,
+  ): Promise<OrderResponseDto> {
+    const where =
+      user.role === UserRole.ADMIN ? { id } : { id, userId: user.id };
+
     const order = await this.repo.findOne({
-      where: { id },
+      where,
+      relations: { user: true },
     });
 
     if (!order) {

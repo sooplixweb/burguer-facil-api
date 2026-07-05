@@ -15,10 +15,13 @@ import { UserResponseDto } from 'src/dtos/response/user-response.dto';
 import { LoginRequestDto } from 'src/dtos/request/login-request.dto';
 import { LoginResponseDto } from 'src/dtos/response/login-response.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { UserRole } from 'src/dtos/enums/user-role.enum';
 
 type AuthenticatedUser = {
   id: string;
   email: string;
+  tenantId: string;
+  role: UserRole;
 };
 
 type AuthenticatedRequest = ExpressRequest & {

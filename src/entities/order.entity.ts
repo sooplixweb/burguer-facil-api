@@ -9,7 +9,11 @@ import {
   UpdateDateColumn,
   Index,
   Generated,
+  ManyToMany,
+  ManyToOne,
+  JoinColumn,
 } from 'typeorm';
+import { UserEntity } from './user.entity';
 
 type OrderHistory = {
   status: OrderStatusEnum;
@@ -22,6 +26,13 @@ type OrderHistory = {
 export class OrderEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
+
+  @Column({ type: 'uuid', nullable: false })
+  userId: string;
+
+  @ManyToOne(() => UserEntity)
+  @JoinColumn({ name: 'userId' })
+  user: UserEntity;
 
   @Index()
   @Column({ type: 'int', unique: true })

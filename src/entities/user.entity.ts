@@ -1,5 +1,5 @@
 import { UserRole } from 'src/dtos/enums/user-role.enum';
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, Generated } from 'typeorm';
 
 @Entity('user')
 export class UserEntity {
