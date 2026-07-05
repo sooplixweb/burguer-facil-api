@@ -4,6 +4,7 @@ import {
   IsNumber,
   IsOptional,
   IsString,
+  IsUUID,
   Min,
 } from 'class-validator';
 import { Type } from 'class-transformer';
@@ -24,7 +25,6 @@ export class AlterStatusDto {
 }
 
 export class OrderRequestDto {
-
   @IsOptional()
   @IsEnum(OrderStatusEnum)
   status?: OrderStatusEnum;
@@ -42,16 +42,8 @@ export class OrderRequestDto {
   customerPhone: string;
 
   @IsNotEmpty()
-  @IsString()
-  addressStreet: string;
-
-  @IsNotEmpty()
-  @IsString()
-  addressCityState: string;
-
-  @IsOptional()
-  @IsString()
-  addressComplement?: string;
+  @IsUUID()
+  addressId: string;
 
   @IsNotEmpty()
   @Type(() => Number)

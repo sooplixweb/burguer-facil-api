@@ -62,10 +62,25 @@ export class ProductsController {
   }
 
   @Patch(':id')
-  async update(@Param('id') id: string, @Body() dto: UpdateProductRequestDto) {
+  @UseInterceptors(
+    FilesInterceptor('images', 10, {
+      storage: diskStorage({
+        destination: './uploads',
+        filename: (req, file, callback) => {
+          const uniqueName = Date.now() + '-' + Math.round(Math.random() * 1e9);
+          callback(null, uniqueName + extname(file.originalname));
+        },
+      }),
+    }),
+  )
+  async update(
+    @Param('id') id: string,
+    @Body() dto: UpdateProductRequestDto,
+    @UploadedFiles() files: Express.Multer.File[],
+  ) {
     return plainToInstance(
       ProductResponseDto,
-      await this.productsService.update(id, dto),
+      await this.productsService.update(id, dto, files),
     );
   }
 

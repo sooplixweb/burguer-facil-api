@@ -56,6 +56,7 @@ export class UserService {
   async findAll(): Promise<UserResponseDto[]> {
     const users = await this.repo.find({
       order: { dateRegistration: 'DESC' },
+      relations: { addresses: true },
     });
 
     return plainToInstance(UserResponseDto, users, {
@@ -77,6 +78,7 @@ export class UserService {
   async findOne(id: string): Promise<UserResponseDto> {
     const user = await this.repo.findOne({
       where: { id },
+      relations: { addresses: true },
     });
     return plainToInstance(UserResponseDto, user, {
       excludeExtraneousValues: true,

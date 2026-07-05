@@ -1,5 +1,6 @@
 import { Expose } from 'class-transformer';
 import { UserRole } from '../enums/user-role.enum';
+import { AddressResponseDto } from './address-response.dto';
 
 export class UserResponseDto {
   @Expose()
@@ -16,7 +17,10 @@ export class UserResponseDto {
 
   @Expose()
   email: string;
-  
+
+  @Expose()
+  addresses: AddressResponseDto[];
+
   @Expose()
   dateRegistration: Date;
 }

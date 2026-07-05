@@ -55,12 +55,14 @@ export class OrdersController {
     return await this.ordersService.findById(id, req.user);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Patch(':id')
   async alterStatus(
     @Param('id') id: string,
     @Body() status: AlterStatusDto,
+    @Req() req: AuthenticatedRequest,
   ): Promise<OrderResponseDto> {
-    return this.ordersService.alterStatus(id, status);
+    return this.ordersService.alterStatus(id, status, req.user);
   }
 
   @Delete(':id')

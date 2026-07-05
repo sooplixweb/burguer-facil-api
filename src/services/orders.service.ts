@@ -1,7 +1,12 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { OrderEntity } from 'src/entities/order.entity';
+import { AddressEntity } from 'src/entities/address.entity';
 import {
   AlterStatusDto,
   OrderRequestDto,
@@ -22,13 +27,26 @@ export class OrdersService {
   constructor(
     @InjectRepository(OrderEntity)
     private readonly repo: Repository<OrderEntity>,
+    @InjectRepository(AddressEntity)
+    private readonly addressRepo: Repository<AddressEntity>,
   ) {}
 
   async create(
     dto: OrderRequestDto,
     userId: string,
   ): Promise<OrderResponseDto> {
-    const order = this.repo.create({ ...dto, userId });
+    const address = await this.addressRepo.findOne({
+      where: {
+        id: dto.addressId,
+        userId,
+      },
+    });
+
+    if (!address) {
+      throw new NotFoundException('Endereço não encontrado');
+    }
+
+    const order = this.repo.create({ ...dto, userId, address });
     order.history = [
       {
         status: OrderStatusEnum.RECEIVED,
@@ -36,16 +54,16 @@ export class OrdersService {
         createdAt: new Date().toISOString(),
       },
     ];
-    await this.repo.save(order);
+    const savedOrder = await this.repo.save(order);
 
-    return plainToInstance(OrderResponseDto, order);
+    return plainToInstance(OrderResponseDto, savedOrder);
   }
 
   async findAll(user: AuthenticatedUser): Promise<OrderResponseDto[]> {
     const where = user.role === UserRole.ADMIN ? {} : { userId: user.id };
     const orders = await this.repo.find({
       where,
-      relations: { user: true },
+      relations: { user: true, address: true },
     });
     return plainToInstance(OrderResponseDto, orders);
   }
@@ -59,7 +77,7 @@ export class OrdersService {
 
     const order = await this.repo.findOne({
       where,
-      relations: { user: true },
+      relations: { user: true, address: true },
     });
 
     if (!order) {
@@ -72,13 +90,51 @@ export class OrdersService {
   async alterStatus(
     id: string,
     status: AlterStatusDto,
+    user: AuthenticatedUser,
   ): Promise<OrderResponseDto> {
+    const where =
+      user.role === UserRole.ADMIN ? { id } : { id, userId: user.id };
+
     const order = await this.repo.findOne({
-      where: { id },
+      where,
+      relations: { user: true, address: true },
     });
 
     if (!order) {
       throw new NotFoundException('Pedido não encontrado');
+    }
+
+    if (
+      user.role !== UserRole.ADMIN &&
+      status.status !== OrderStatusEnum.CANCELED
+    ) {
+      throw new BadRequestException('Cliente só pode cancelar o pedido');
+    }
+
+    if (status.status === OrderStatusEnum.CANCELED) {
+      if (order.status === OrderStatusEnum.DELIVERED) {
+        throw new BadRequestException('Pedido entregue não pode ser cancelado');
+      }
+
+      if (order.status !== OrderStatusEnum.CANCELED) {
+        order.status = OrderStatusEnum.CANCELED;
+        order.history = [
+          ...(order.history ?? []),
+          {
+            status: OrderStatusEnum.CANCELED,
+            label: 'Pedido cancelado',
+            createdAt: new Date().toISOString(),
+          },
+        ];
+      }
+
+      const canceledOrder = await this.repo.save(order);
+
+      return plainToInstance(OrderResponseDto, canceledOrder);
+    }
+
+    if (order.status === OrderStatusEnum.CANCELED) {
+      throw new BadRequestException('Pedido cancelado não pode ser alterado');
     }
 
     if (

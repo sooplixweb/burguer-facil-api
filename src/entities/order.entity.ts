@@ -9,11 +9,11 @@ import {
   UpdateDateColumn,
   Index,
   Generated,
-  ManyToMany,
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
 import { UserEntity } from './user.entity';
+import { AddressEntity } from './address.entity';
 
 type OrderHistory = {
   status: OrderStatusEnum;
@@ -50,20 +50,20 @@ export class OrderEntity {
   @Column({ type: 'enum', enum: PaymentMethodEnum })
   paymentMethod: PaymentMethodEnum;
 
+  @Column({ type: 'uuid', nullable: true })
+  addressId?: string;
+
+  @ManyToOne(() => AddressEntity, (address) => address.orders, {
+    nullable: true,
+  })
+  @JoinColumn({ name: 'addressId' })
+  address?: AddressEntity;
+
   @Column({ type: 'varchar', length: 160 })
   customerName: string;
 
   @Column({ type: 'varchar', length: 30 })
   customerPhone: string;
-
-  @Column({ type: 'varchar', length: 200 })
-  addressStreet: string;
-
-  @Column({ type: 'varchar', length: 140 })
-  addressCityState: string;
-
-  @Column({ type: 'varchar', length: 200, nullable: true })
-  addressComplement?: string;
 
   @Column({ type: 'numeric', precision: 12, scale: 2, default: 0 })
   subtotal: number;

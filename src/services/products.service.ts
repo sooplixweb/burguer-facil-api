@@ -72,17 +72,79 @@ export class ProductsService {
     return product;
   }
 
-  async update(id: string, dto: UpdateProductRequestDto) {
+  async update(
+    id: string,
+    dto: UpdateProductRequestDto,
+    files?: Express.Multer.File[],
+  ) {
     this.logger.log(`Atualizando produto: ${id}`);
     this.logger.debug(`Payload de atualização: ${JSON.stringify(dto)}`);
 
     const product = await this.findOne(id);
-    Object.assign(product, dto);
+    const { existingImageIds, primaryImageId, ...productDto } = dto;
+
+    Object.assign(product, {
+      ...productDto,
+      ...(productDto.price !== undefined
+        ? { price: productDto.price.toString() }
+        : {}),
+      ...(productDto.promoPrice !== undefined
+        ? { promoPrice: productDto.promoPrice?.toString() }
+        : {}),
+      ...(productDto.stockEnabled !== undefined
+        ? { stockEnabled: Boolean(productDto.stockEnabled) }
+        : {}),
+    });
+
+    if (existingImageIds) {
+      const keepIds = new Set(existingImageIds.map(String));
+      const currentImages = product.images || [];
+      const removeIds = currentImages
+        .filter((image) => !keepIds.has(String(image.id)))
+        .map((image) => Number(image.id))
+        .filter((imageId) => Number.isFinite(imageId));
+
+      await this.imageService.removeByIds(removeIds);
+      product.images = currentImages.filter((image) =>
+        keepIds.has(String(image.id)),
+      );
+    }
+
+    let existingPrimarySelected = false;
+    if (primaryImageId && product.images?.length) {
+      product.images = product.images.map((image) => {
+        const isPrimary = String(image.id) === String(primaryImageId);
+        if (isPrimary) existingPrimarySelected = true;
+        return { ...image, isPrimary };
+      });
+    } else if (files?.length && product.images?.length) {
+      product.images = product.images.map((image) => ({
+        ...image,
+        isPrimary: false,
+      }));
+    }
 
     const updated = await this.repo.save(product);
+
+    if (files?.length) {
+      this.logger.log(
+        `Salvando ${files.length} novas imagens para o produto ${id}`,
+      );
+      const images = await this.imageService.saveAll(files, updated, {
+        firstIsPrimary: !existingPrimarySelected,
+      });
+      updated.images = [...(updated.images || []), ...images];
+    }
+
+    if (updated.images?.length && !updated.images.some((image) => image.isPrimary)) {
+      updated.images[0].isPrimary = true;
+    }
+
+    await this.repo.save(updated);
+
     this.logger.log(`Produto atualizado com sucesso: ${id}`);
 
-    return updated;
+    return this.findOne(id);
   }
 
   async remove(id: string) {

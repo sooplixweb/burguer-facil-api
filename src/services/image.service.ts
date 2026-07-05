@@ -14,16 +14,23 @@ export class ImageService {
   async saveAll(
     files: Express.Multer.File[],
     product: ProductEntity,
+    options?: { firstIsPrimary?: boolean },
   ): Promise<ImageEntity[]> {
+    const firstIsPrimary = options?.firstIsPrimary ?? true;
     const images = files.map((file, index) =>
       this.repo.create({
         fileName: file.originalname,
         url: `uploads/${file.filename}`,
-        isPrimary: index === 0,
+        isPrimary: firstIsPrimary && index === 0,
         product,
       }),
     );
 
     return this.repo.save(images);
+  }
+
+  async removeByIds(ids: number[]): Promise<void> {
+    if (!ids.length) return;
+    await this.repo.delete(ids);
   }
 }

@@ -1,5 +1,13 @@
 import { UserRole } from 'src/dtos/enums/user-role.enum';
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, Generated } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  Generated,
+  OneToMany,
+} from 'typeorm';
+import { AddressEntity } from './address.entity';
 
 @Entity('user')
 export class UserEntity {
@@ -19,6 +27,11 @@ export class UserEntity {
     default: UserRole.CUSTOMER,
   })
   role: UserRole;
+
+  @OneToMany(() => AddressEntity, (address) => address.user, {
+    onDelete: 'CASCADE',
+  })
+  addresses: AddressEntity[];
 
   @Column({ unique: true })
   email: string;
