@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { SystemSettingsRequestDto } from 'src/dtos/request/system-settings-request.dto';
 import { SystemSettingsResponseDto } from 'src/dtos/response/system-settings-response.dto';
 import { SystemSettingsEntity } from 'src/entities/system-settings-entity';
+import { toResponse } from 'src/utils/transform-response';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -63,7 +64,7 @@ export class SystemSettingsService {
   ): SystemSettingsResponseDto {
     const availability = this.getAvailability(settings);
 
-    return {
+    return toResponse(SystemSettingsResponseDto, {
       id: settings.id,
       openingTime: settings.openingTime,
       closingTime: settings.closingTime,
@@ -73,7 +74,7 @@ export class SystemSettingsService {
       reason: availability.reason,
       createdAt: settings.createdAt,
       updatedAt: settings.updatedAt,
-    };
+    });
   }
 
   private getAvailability(settings: SystemSettingsEntity): {

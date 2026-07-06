@@ -7,6 +7,7 @@ import { UserModule } from './modules/user.module';
 import { OrdersModule } from './modules/orders.module';
 import { SystemSettingsModule } from './modules/system-settings.module';
 import { AddressModule } from './modules/address.module';
+import { ChatModule } from './modules/chat.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { AddressModule } from './modules/address.module';
     UserModule,
     SystemSettingsModule,
     AddressModule,
+    ChatModule,
   ],
 })
 export class AppModule {}

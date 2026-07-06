@@ -1,6 +1,6 @@
 import { Expose, Type } from 'class-transformer';
 import { ProductCategoryEnum } from '../enums/product-category.enum';
-import { ProductAddonRequestDto } from '../request/product-addons-request.dto';
+import { ProductAddonResponseDto } from './product-addon-response.dto';
 import { ProductImageResponseDto } from './product-images-response.tdo';
 import { ProductStatusEnum } from '../enums/product-status.enum';
 
@@ -37,7 +37,8 @@ export class ProductResponseDto {
   images: ProductImageResponseDto[];
 
   @Expose()
-  addons?: ProductAddonRequestDto[];
+  @Type(() => ProductAddonResponseDto)
+  addons?: ProductAddonResponseDto[];
 
   @Expose()
   createdAt: Date;

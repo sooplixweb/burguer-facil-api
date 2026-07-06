@@ -4,7 +4,6 @@ import {
   PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
-  Generated,
   OneToMany,
 } from 'typeorm';
 import { AddressEntity } from './address.entity';

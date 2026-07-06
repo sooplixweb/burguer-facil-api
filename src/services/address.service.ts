@@ -1,10 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { plainToInstance } from 'class-transformer';
 import { AddressRequestDto } from 'src/dtos/request/address-request.dto';
 import { AddressResponseDto } from 'src/dtos/response/address-response.dto';
 import { UserRole } from 'src/dtos/enums/user-role.enum';
 import { AddressEntity } from 'src/entities/address.entity';
+import { toResponse } from 'src/utils/transform-response';
 import { Not, Repository } from 'typeorm';
 
 type AuthenticatedUser = {
@@ -53,9 +53,7 @@ export class AddressService {
       },
     });
 
-    return plainToInstance(AddressResponseDto, addresses, {
-      excludeExtraneousValues: true,
-    });
+    return toResponse(AddressResponseDto, addresses);
   }
 
   async findById(
@@ -126,8 +124,6 @@ export class AddressService {
   }
 
   private toResponse(address: AddressEntity): AddressResponseDto {
-    return plainToInstance(AddressResponseDto, address, {
-      excludeExtraneousValues: true,
-    });
+    return toResponse(AddressResponseDto, address);
   }
 }

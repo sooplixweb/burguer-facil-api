@@ -11,12 +11,12 @@ import { UserEntity } from 'src/entities/user.entity';
 import { UserRequestDto } from 'src/dtos/request/user-request.dto';
 import { UpdateUserRequestDto } from 'src/dtos/request/update-user-request.dto';
 import { UserResponseDto } from 'src/dtos/response/user-response.dto';
-import { plainToInstance } from 'class-transformer';
 import * as bcrypt from 'bcrypt';
 import { LoginRequestDto } from 'src/dtos/request/login-request.dto';
 import { LoginResponseDto } from 'src/dtos/response/login-response.dto';
 import { JwtService } from '@nestjs/jwt';
 import { UserRole } from 'src/dtos/enums/user-role.enum';
+import { toResponse } from 'src/utils/transform-response';
 @Injectable()
 export class UserService {
   private readonly logger = new Logger(UserService.name);
@@ -48,9 +48,7 @@ export class UserService {
 
     const savedUser = await this.repo.save(userSave);
 
-    return plainToInstance(UserResponseDto, savedUser, {
-      excludeExtraneousValues: true,
-    });
+    return toResponse(UserResponseDto, savedUser);
   }
 
   async findAll(): Promise<UserResponseDto[]> {
@@ -59,9 +57,7 @@ export class UserService {
       relations: { addresses: true },
     });
 
-    return plainToInstance(UserResponseDto, users, {
-      excludeExtraneousValues: true,
-    });
+    return toResponse(UserResponseDto, users);
   }
 
   async findCustomers(): Promise<UserResponseDto[]> {
@@ -70,9 +66,7 @@ export class UserService {
       order: { dateRegistration: 'DESC' },
     });
 
-    return plainToInstance(UserResponseDto, users, {
-      excludeExtraneousValues: true,
-    });
+    return toResponse(UserResponseDto, users);
   }
 
   async findOne(id: string): Promise<UserResponseDto> {
@@ -80,9 +74,12 @@ export class UserService {
       where: { id },
       relations: { addresses: true },
     });
-    return plainToInstance(UserResponseDto, user, {
-      excludeExtraneousValues: true,
-    });
+
+    if (!user) {
+      throw new NotFoundException('Usuário não encontrado');
+    }
+
+    return toResponse(UserResponseDto, user);
   }
 
   async update(
@@ -115,9 +112,7 @@ export class UserService {
 
     const updatedUser = await this.repo.save(user);
 
-    return plainToInstance(UserResponseDto, updatedUser, {
-      excludeExtraneousValues: true,
-    });
+    return toResponse(UserResponseDto, updatedUser);
   }
 
   async remove(id: string): Promise<string> {
@@ -150,11 +145,11 @@ export class UserService {
 
     const token = this.jwtService.sign(payload);
 
-    return {
+    return toResponse(LoginResponseDto, {
       token,
       expiresIn: 60,
       role: user.role,
-      user: user, // só informativo para o front
-    };
+      user,
+    });
   }
 }

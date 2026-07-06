@@ -8,6 +8,7 @@ import { ProductEntity } from 'src/entities/product-entity';
 import { ProductsModule } from './products.module';
 import { ImageService } from 'src/services/image.service';
 import { OrdersService } from 'src/services/orders.service';
+import { ChatModule } from './chat.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { OrdersService } from 'src/services/orders.service';
       AddressEntity,
     ]),
     ProductsModule,
+    ChatModule,
   ],
   controllers: [OrdersController],
   providers: [OrdersService, ImageService],

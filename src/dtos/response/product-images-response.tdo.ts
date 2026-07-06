@@ -2,7 +2,7 @@ import { Expose } from 'class-transformer';
 
 export class ProductImageResponseDto {
   @Expose()
-  id: string;
+  id: number;
 
   @Expose()
   fileName: string;

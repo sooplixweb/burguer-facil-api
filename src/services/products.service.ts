@@ -136,7 +136,10 @@ export class ProductsService {
       updated.images = [...(updated.images || []), ...images];
     }
 
-    if (updated.images?.length && !updated.images.some((image) => image.isPrimary)) {
+    if (
+      updated.images?.length &&
+      !updated.images.some((image) => image.isPrimary)
+    ) {
       updated.images[0].isPrimary = true;
     }
 

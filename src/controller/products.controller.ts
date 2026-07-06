@@ -12,12 +12,12 @@ import {
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
-import { plainToInstance } from 'class-transformer';
 import { ProductStatusEnum } from 'src/dtos/enums/product-status.enum';
 import { ProductRequestDto } from 'src/dtos/request/product-request.dto';
 import { UpdateProductRequestDto } from 'src/dtos/request/update-product.dto';
 import { ProductResponseDto } from 'src/dtos/response/product-response.dto';
 import { ProductsService } from 'src/services/products.service';
+import { toResponse } from 'src/utils/transform-response';
 
 @Controller('products')
 export class ProductsController {
@@ -39,7 +39,7 @@ export class ProductsController {
     @Body() dto: ProductRequestDto,
     @UploadedFiles() files: Express.Multer.File[],
   ) {
-    return plainToInstance(
+    return toResponse(
       ProductResponseDto,
       await this.productsService.create(dto, files),
     );
@@ -47,15 +47,12 @@ export class ProductsController {
 
   @Get()
   async findAll() {
-    return plainToInstance(
-      ProductResponseDto,
-      await this.productsService.findAll(),
-    );
+    return toResponse(ProductResponseDto, await this.productsService.findAll());
   }
 
   @Get(':id')
   async findOne(@Param('id') id: string) {
-    return plainToInstance(
+    return toResponse(
       ProductResponseDto,
       await this.productsService.findOne(id),
     );
@@ -78,7 +75,7 @@ export class ProductsController {
     @Body() dto: UpdateProductRequestDto,
     @UploadedFiles() files: Express.Multer.File[],
   ) {
-    return plainToInstance(
+    return toResponse(
       ProductResponseDto,
       await this.productsService.update(id, dto, files),
     );

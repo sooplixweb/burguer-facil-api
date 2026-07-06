@@ -12,9 +12,10 @@ import {
   OrderRequestDto,
 } from 'src/dtos/request/order-request.dto';
 import { OrderResponseDto } from 'src/dtos/response/orders-response.dto';
-import { plainToInstance } from 'class-transformer';
 import { OrderStatusEnum } from 'src/dtos/enums/order-status.enum';
 import { UserRole } from 'src/dtos/enums/user-role.enum';
+import { ChatService } from './chat.service';
+import { toResponse } from 'src/utils/transform-response';
 
 type AuthenticatedUser = {
   id: string;
@@ -29,16 +30,17 @@ export class OrdersService {
     private readonly repo: Repository<OrderEntity>,
     @InjectRepository(AddressEntity)
     private readonly addressRepo: Repository<AddressEntity>,
+    private readonly chatService: ChatService,
   ) {}
 
   async create(
     dto: OrderRequestDto,
-    userId: string,
+    user: AuthenticatedUser,
   ): Promise<OrderResponseDto> {
     const address = await this.addressRepo.findOne({
       where: {
         id: dto.addressId,
-        userId,
+        userId: user.id,
       },
     });
 
@@ -46,7 +48,7 @@ export class OrdersService {
       throw new NotFoundException('Endereço não encontrado');
     }
 
-    const order = this.repo.create({ ...dto, userId, address });
+    const order = this.repo.create({ ...dto, userId: user.id, address });
     order.history = [
       {
         status: OrderStatusEnum.RECEIVED,
@@ -54,18 +56,24 @@ export class OrdersService {
         createdAt: new Date().toISOString(),
       },
     ];
-    const savedOrder = await this.repo.save(order);
 
-    return plainToInstance(OrderResponseDto, savedOrder);
+    const savedOrder = await this.repo.save(order);
+    await this.chatService.create({ orderId: savedOrder.id }, user);
+
+    return this.findById(savedOrder.id, user);
   }
 
   async findAll(user: AuthenticatedUser): Promise<OrderResponseDto[]> {
     const where = user.role === UserRole.ADMIN ? {} : { userId: user.id };
     const orders = await this.repo.find({
       where,
-      relations: { user: true, address: true },
+      relations: {
+        user: true,
+        address: true,
+        chat: { messages: { sender: true } },
+      },
     });
-    return plainToInstance(OrderResponseDto, orders);
+    return toResponse(OrderResponseDto, orders);
   }
 
   async findById(
@@ -77,14 +85,18 @@ export class OrdersService {
 
     const order = await this.repo.findOne({
       where,
-      relations: { user: true, address: true },
+      relations: {
+        user: true,
+        address: true,
+        chat: { messages: { sender: true } },
+      },
     });
 
     if (!order) {
       throw new NotFoundException('Pedido não encontrado');
     }
 
-    return plainToInstance(OrderResponseDto, order);
+    return toResponse(OrderResponseDto, order);
   }
 
   async alterStatus(
@@ -97,7 +109,11 @@ export class OrdersService {
 
     const order = await this.repo.findOne({
       where,
-      relations: { user: true, address: true },
+      relations: {
+        user: true,
+        address: true,
+        chat: { messages: { sender: true } },
+      },
     });
 
     if (!order) {
@@ -130,7 +146,7 @@ export class OrdersService {
 
       const canceledOrder = await this.repo.save(order);
 
-      return plainToInstance(OrderResponseDto, canceledOrder);
+      return toResponse(OrderResponseDto, canceledOrder);
     }
 
     if (order.status === OrderStatusEnum.CANCELED) {
@@ -184,7 +200,7 @@ export class OrdersService {
 
     const data = await this.repo.save(order);
 
-    return plainToInstance(OrderResponseDto, data);
+    return toResponse(OrderResponseDto, data);
   }
 
   // async update(id: string, dto: UpdateProductDto) {

@@ -11,9 +11,11 @@ import {
   Generated,
   ManyToOne,
   JoinColumn,
+  OneToOne,
 } from 'typeorm';
 import { UserEntity } from './user.entity';
 import { AddressEntity } from './address.entity';
+import { ChatEntity } from './chat.entity';
 
 type OrderHistory = {
   status: OrderStatusEnum;
@@ -33,6 +35,13 @@ export class OrderEntity {
   @ManyToOne(() => UserEntity)
   @JoinColumn({ name: 'userId' })
   user: UserEntity;
+
+  @Column({ type: 'uuid', nullable: true })
+  chatId?: string;
+
+  @OneToOne(() => ChatEntity, (chat) => chat.order)
+  @JoinColumn({ name: 'chatId' })
+  chat?: ChatEntity;
 
   @Index()
   @Column({ type: 'int', unique: true })

@@ -37,7 +37,7 @@ export class OrdersController {
     @Body() dto: OrderRequestDto,
     @Req() req: AuthenticatedRequest,
   ): Promise<OrderResponseDto> {
-    return await this.ordersService.create(dto, req.user.id);
+    return await this.ordersService.create(dto, req.user);
   }
 
   @UseGuards(JwtAuthGuard)
